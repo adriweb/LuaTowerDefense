@@ -1,0 +1,20 @@
+Aide en français : (English : previous tab) 
+
+1. introduction 
+Merci de jouer à LuaTowerDefense! 
+La première chose que vous voyez lorsque vous ouvrez le jeu (onglet 1.2), est le menu principal. De là, vous pouvez lancer un nouveau jeu (ou charger un si possible -ce vous sera demandé-), ainsi que voir des stats globales et une fenêtre d'à propos.
+
+2. Jouer au jeu 
+Lorsque vous commencez à jouer, vous verrez une grille représentant la carte. L'objectif est de placer stratégiquement des tours sur le bord des routes pour empêcher les ennemis d'atteindre la fin (rouge). 
+Le jeu peut être entièrement contrôlé par la souris ou le clavier. Les flèches du clavier vous permettront de déplacer la sélection, et "Enter" pour faire une action relative à cette sélection (ou, à la souris : point&click). Pour créer une tour, sélectionnez une case vide et faites un clic/entrer; pour la mettre à niveau (moitié du prix) / vendre (80% du prix) : clic/entrer sur la tour. Pour lancer une vague ennemie, clic/entrer n'importe où sur une case de route. Il y a les raccourcis clavier pour la création de tours : «a» pour Air, «e» pour Terre, 'f' pour Feu, 'w' pour Eau. 
+
+3. Plus 
+Vous êtes en mesure de sauvegarder une partie, mais par contre (quelque chose que l'on peut voir sur ce genre de jeu), lorsque vous chargez, vous obtiendrez l'argent et le niveau sauvé, mais pas les tours placées. 
+
+4. What's next ? 
+Edition / Chargement de carte, marche à peu près dans une version alpha. Pas dispo ici. 
+Des sprites plus jolis et des animations fluides pour le mouvement des ennemis ! 
+Tout feedback est apprécié ;-) 
+
+5. Contact: 
+Adriweb - tiplanet.org ou inspired-lua.org
