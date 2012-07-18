@@ -7,15 +7,13 @@
 -- Original Screen Manager by Levak
 -- Highly modified version by Jim Bauwens
 ---------------------------------------------------
--- version 1.0
+-- version 1.1
 
 ---------------------
 -- Todo :
 ---------------------
 -- attacking [animations]
 -- lvl selection
-
--- to be saved with Luna
 
 
 ------------------------------------------------------------------
@@ -472,45 +470,38 @@ function WidgetManager:arrowKey(arrow)
 	if self.focus~=0 then
 		self:getWidget():arrowKey(arrow)
 	end
-	self:invalidate()
 end
 
 function WidgetManager:enterKey()	
 	if self.focus~=0 then
 		self:getWidget():enterKey()
 	end
-	self:invalidate()
 end
 
 function WidgetManager:backspaceKey()
 	if self.focus~=0 then
 		self:getWidget():backspaceKey()
 	end
-	self:invalidate()
 end
 
 function WidgetManager:escapeKey()	
 	if self.focus~=0 then
 		self:getWidget():escapeKey()
 	end
-	self:invalidate()
 end
 
 function WidgetManager:tabKey()	
 	self:switchFocus(1)
-	self:invalidate()
 end
 
 function WidgetManager:backtabKey()	
 	self:switchFocus(-1)
-	self:invalidate()
 end
 
 function WidgetManager:charIn(char)
 	if self.focus~=0 then
 		self:getWidget():charIn(char)
 	end
-	self:invalidate()
 end
 
 function WidgetManager:getWidgetIn(x, y)
@@ -544,8 +535,8 @@ function WidgetManager:mouseUp(x, y)
 	if self.focus~=0 then
 		self:getWidget():mouseUp(x, y)
 	end
-	self:invalidate()
 end
+
 function WidgetManager:mouseMove(x, y)
 	if self.focus~=0 then
 		self:getWidget():mouseMove(x, y)
@@ -557,7 +548,6 @@ end
 --------------------------
 
 WScreen	= addExtension(Screen, WidgetManager)
-
 
 
 --Dialog screen
@@ -1491,8 +1481,8 @@ function Enemy:init(gridX, gridY, theType, level, id)
     self.level = level
     self.id = id
     totalEnemiesNumber = id
-    self.totalLife = 60+15*self.level
-    self.life = 60+15*self.level 
+    self.life = 60+15*self.level+((self.level > 2) and (10+self.level*2)*self.level or 0)
+    self.totalLife = self.life
     self.prevX = gridX
     self.prevY = gridY
     self.prev2X = self.prevX
@@ -1539,10 +1529,10 @@ function Enemy:move()
             end
             StatusBar.livesLeft = GameState.lives -- destroyed because at the end.
         else -- > a tower killed the enemy
-            GameState.score = GameState.score + 10*GameState.level
+            GameState.score = GameState.score + 10*GameState.level + GameState.lives
             GameState.totalKills = GameState.totalKills + 1
             if GameState.score > GameState.bestScore then GameState.bestScore = GameState.score end
-            local addMoney = ((GameState.level > 5) and 1 or 2)*GameState.level
+            local addMoney = GameState.level --meh, think about better algo.... TODO
             GameState.money = GameState.money + addMoney
             GameState.totalMoney = GameState.totalMoney + addMoney
         end
@@ -1690,7 +1680,7 @@ end
 
 function showGameOver()
     
-    GameOverWindow	= Dialog("Game over !", 20, 20, 200, 90)
+    GameOverWindow	= Dialog("Game over !", 20, 20, 200, 75)
     
     local GameOverTxt	= [[You lose the game ! 
 Your score is : ]] .. GameState.score .. [[ 
@@ -1703,12 +1693,8 @@ Your score is : ]] .. GameState.score .. [[
         GameOverWindow:appendWidget(theText, 10, 27 + i*14-12)
     end
     
-    GameOverWindow:appendWidget(GameOverOKButton,-10,-5)
-    
-    function GameOverWindow:postPaint(gc)
-        nativeBar(gc, self, self.h-39)
-    end
-    
+    GameOverWindow:appendWidget(GameOverOKButton,-10,40)
+
     GameOverOKButton:giveFocus()
     
     function GameOverWindow:escapeKey()
@@ -1782,12 +1768,12 @@ end
 function removeTower(id)
     print("removing tower #"..id)
     local theTower = copyTable(towersTable[id])
-    towersTable[id] = {}
+    towersTable[id] = false --{}
     gameGrid.gridSquares[theTower.gridY][theTower.gridX] = deepcopy(gameGridEmpty.gridSquares[theTower.gridY][theTower.gridX])
 end
 
 function Tower:upgrade()
-    if self.level < 2 then
+    if self.level < 2 and GameState.money >= self.price/2 then
         self.level = self.level + 1
         self.range = self.range + 1
         gameGrid.gridSquares[self.gridY][self.gridX].level = self.level
@@ -1856,7 +1842,6 @@ end
 function PauseMenuScreen:escapeKey()
     gamePaused = false
     remove_screen(PauseMenuScreen)
-    platform.window:invalidate()
 end
 
 ResumeButton = sButton(" Resume ", function() PauseMenuScreen:escapeKey() end)
@@ -2117,7 +2102,9 @@ end
 function GameScreen:timer()
     if not gamePaused then
         for _,tower in pairs(towersTable) do
-            tower:action()
+            if tower and tower.action then
+                tower:action()
+            end
         end
         local enCount = enCount or 0
         for _,enemy in pairs(enemiesTable) do
@@ -2391,7 +2378,7 @@ function createWaveConfirm()
         WaveConfirm:escapeKey()
         GameState.level = GameState.level + 1
         GameState.totalWaves = GameState.totalWaves + 1
-        timer.start(0.3)
+        timer.start(0.25)
     end
             
     WaveYesButton = sButton(" Yes ", function() startTheWave() end )
@@ -2548,7 +2535,7 @@ end
 
 HelpWindow	= Dialog("About LuaTowerDefense :", 150, 20, 270, 180)
 
-local HelpStr	= [[                                                      v1.0
+local HelpStr	= [[                                                      v1.1
  -----------------------------
 Adrien Bertrand (Adriweb). LGPL 3 License
 Thanks to Levak and Jim Bauwens.
